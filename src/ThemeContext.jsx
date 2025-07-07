@@ -9,7 +9,11 @@ export const useTheme = () => useContext(ThemeContext);
 // Theme provider component
 export const ThemeProvider = ({ children }) => {
     // State to track the current theme (dark by default)
-    const [isDarkTheme, setIsDarkTheme] = useState(true);
+    const isDarkByDefault = window.matchMedia(
+        '(prefers-color-scheme: dark)'
+    ).matches;
+
+    const [isDarkTheme, setIsDarkTheme] = useState(isDarkByDefault);
 
     // Function to toggle between dark and light themes
     const toggleTheme = () => {
