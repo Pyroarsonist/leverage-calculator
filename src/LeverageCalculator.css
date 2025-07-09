@@ -178,6 +178,67 @@
 }
 
 
+/* Position toggle styles */
+.position-toggle-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px 0;
+  gap: 10px;
+}
+
+.position-toggle-container span {
+  font-weight: 500;
+  color: var(--text-color);
+  opacity: 0.6;
+  transition: opacity 0.3s ease, color 0.3s ease;
+}
+
+.position-toggle-container span.active {
+  opacity: 1;
+  font-weight: bold;
+}
+
+.position-toggle {
+  position: relative;
+  width: 60px;
+  height: 30px;
+  border-radius: 15px;
+  background-color: var(--input-border);
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  padding: 0;
+}
+
+.position-toggle.long {
+  background-color: #28a745; /* Green for long */
+}
+
+.position-toggle.short {
+  background-color: #dc3545; /* Red for short */
+}
+
+.position-toggle-slider {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: white;
+  transition: transform 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.position-toggle.long .position-toggle-slider {
+  transform: translateX(30px);
+}
+
+.position-toggle:hover {
+  opacity: 0.9;
+}
+
 @media (max-width: 600px) {
   .LeverageCalculator {
     padding: 10px;

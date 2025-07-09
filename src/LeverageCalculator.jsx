@@ -34,6 +34,9 @@ function LeverageCalculator() {
     const [marginRequirement, setMarginRequirement] = useState(() =>
         getStoredValue('marginRequirement', 100)
     );
+    const [isLong, setIsLong] = useState(
+        () => localStorage.getItem('isLong') !== 'false'
+    );
     const { isDarkTheme, toggleTheme } = useTheme();
 
     useEffect(() => {
@@ -51,6 +54,10 @@ function LeverageCalculator() {
     useEffect(() => {
         saveToLocalStorage('marginRequirement', marginRequirement);
     }, [marginRequirement]);
+
+    useEffect(() => {
+        localStorage.setItem('isLong', isLong.toString());
+    }, [isLong]);
 
     const handleLeverageChange = (e) => {
         const value = parseFloat(e.target.value) || 0;
@@ -72,11 +79,16 @@ function LeverageCalculator() {
         setMarginRequirement(value);
     };
 
-    const { profitLoss, pnl } = calculate({
+    const togglePositionType = () => {
+        setIsLong(!isLong);
+    };
+
+    const { profitLoss, pnl, liquidationPrice } = calculate({
         leverage,
         entryPrice,
         exitPrice,
         marginRequirement,
+        isLong,
     });
 
     return (
@@ -97,7 +109,9 @@ function LeverageCalculator() {
             </header>
             <main className="calculator-container">
                 <div className="input-group">
-                    <label htmlFor="leverage" data-unit="x">Leverage</label>
+                    <label htmlFor="leverage" data-unit="x">
+                        Leverage
+                    </label>
                     <input
                         id="leverage"
                         type="number"
@@ -110,7 +124,9 @@ function LeverageCalculator() {
                 </div>
 
                 <div className="input-group">
-                    <label htmlFor="entry-price" data-unit="$">Entry Price</label>
+                    <label htmlFor="entry-price" data-unit="$">
+                        Entry Price
+                    </label>
                     <input
                         id="entry-price"
                         type="number"
@@ -123,7 +139,9 @@ function LeverageCalculator() {
                 </div>
 
                 <div className="input-group">
-                    <label htmlFor="exit-price" data-unit="$">Exit Price</label>
+                    <label htmlFor="exit-price" data-unit="$">
+                        Exit Price
+                    </label>
                     <input
                         id="exit-price"
                         type="number"
@@ -150,6 +168,22 @@ function LeverageCalculator() {
                     />
                 </div>
 
+                <div className="position-toggle-container">
+                    <span className={!isLong ? 'active' : ''}>Short</span>
+                    <button
+                        className={`position-toggle ${isLong ? 'long' : 'short'}`}
+                        onClick={togglePositionType}
+                        aria-label={
+                            isLong
+                                ? 'Switch to short position'
+                                : 'Switch to long position'
+                        }
+                    >
+                        <span className="position-toggle-slider"></span>
+                    </button>
+                    <span className={isLong ? 'active' : ''}>Long</span>
+                </div>
+
                 <div className="results">
                     <div className="result-item">
                         <span>PNL:</span>
@@ -165,6 +199,12 @@ function LeverageCalculator() {
                             className={`result-value ${parseFloat(pnl) > 0 ? 'positive' : parseFloat(pnl) < 0 ? 'negative' : ''}`}
                         >
                             {pnl}%
+                        </span>
+                    </div>
+                    <div className="result-item">
+                        <span>Liquidation Price:</span>
+                        <span className="result-value">
+                            {liquidationPrice}$
                         </span>
                     </div>
                 </div>
