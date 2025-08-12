@@ -40,6 +40,12 @@ function LeverageCalculator() {
     const [intermediatePrice, setIntermediatePrice] = useState(() =>
         getStoredValue('intermediatePrice', 0)
     );
+    const [feePercentage, setFeePercentage] = useState(() =>
+        getStoredValue('feePercentage', 0.05)
+    );
+    const [feesEnabled, setFeesEnabled] = useState(
+        () => localStorage.getItem('feesEnabled') !== 'false'
+    );
     const { isDarkTheme, toggleTheme } = useTheme();
 
     useEffect(() => {
@@ -65,6 +71,14 @@ function LeverageCalculator() {
     useEffect(() => {
         saveToLocalStorage('intermediatePrice', intermediatePrice);
     }, [intermediatePrice]);
+    
+    useEffect(() => {
+        saveToLocalStorage('feePercentage', feePercentage);
+    }, [feePercentage]);
+    
+    useEffect(() => {
+        localStorage.setItem('feesEnabled', feesEnabled.toString());
+    }, [feesEnabled]);
 
     const handleLeverageChange = (e) => {
         const value = parseFloat(e.target.value);
@@ -91,6 +105,15 @@ function LeverageCalculator() {
         setIntermediatePrice(value);
     };
 
+    const handleFeePercentageChange = (e) => {
+        const value = parseFloat(e.target.value);
+        setFeePercentage(value);
+    };
+
+    const toggleFeesEnabled = () => {
+        setFeesEnabled(!feesEnabled);
+    };
+
     const togglePositionType = () => {
         setIsLong(!isLong);
     };
@@ -101,6 +124,8 @@ function LeverageCalculator() {
         liquidationPrice,
         intermediatePnlAbsolute,
         intermediatePnlPercent,
+        fees,
+        pnlAfterFees,
         isWrongInput,
     } = calculate({
         leverage,
@@ -109,193 +134,255 @@ function LeverageCalculator() {
         marginRequirement,
         isLong,
         intermediatePrice,
+        feePercentage,
+        feesEnabled,
     });
 
     return (
         <div className="LeverageCalculator">
-            <header className="LeverageCalculator-header">
-                <h1>Leverage Calculator</h1>
-                <button
-                    className="theme-toggle"
-                    onClick={toggleTheme}
-                    aria-label={
-                        isDarkTheme
-                            ? 'Switch to light mode'
-                            : 'Switch to dark mode'
-                    }
-                >
-                    {isDarkTheme ? '☀️' : '🌙'}
-                </button>
-            </header>
-            <main className="calculator-container">
-                <div className="input-group">
-                    <label htmlFor="leverage" data-unit="x">
-                        Leverage
-                    </label>
+            <div className="fees-container">
+                <h3>Fees</h3>
+                <div className="fees-checkbox">
                     <input
-                        id="leverage"
-                        type="number"
-                        value={leverage}
-                        onChange={handleLeverageChange}
-                        min="0"
-                        step="0.1"
-                        placeholder="1.0"
+                        type="checkbox"
+                        id="fees-enabled"
+                        checked={feesEnabled}
+                        onChange={toggleFeesEnabled}
                     />
+                    <label htmlFor="fees-enabled">Enable Fees</label>
                 </div>
-
                 <div className="input-group">
-                    <label htmlFor="entry-price" data-unit="$">
-                        Entry Price
+                    <label htmlFor="fee-percentage" data-unit="%">
+                        Fee Percentage
                     </label>
                     <input
-                        id="entry-price"
+                        id="fee-percentage"
                         type="number"
-                        value={entryPrice}
-                        onChange={handleEntryPriceChange}
+                        value={feePercentage}
+                        onChange={handleFeePercentageChange}
                         min="0"
                         step="0.01"
-                        placeholder="0.00"
+                        placeholder="0.05"
+                        disabled={!feesEnabled}
                     />
                 </div>
-
-                <div className="input-group">
-                    <label htmlFor="exit-price" data-unit="$">
-                        Exit Price
-                    </label>
-                    <input
-                        id="exit-price"
-                        type="number"
-                        value={exitPrice}
-                        onChange={handleExitPriceChange}
-                        min="0"
-                        step="0.01"
-                        placeholder="0.00"
-                    />
-                </div>
-
-                <div className="input-group">
-                    <label htmlFor="margin-requirement" data-unit="$">
-                        Margin Requirement
-                    </label>
-                    <input
-                        id="margin-requirement"
-                        type="number"
-                        value={marginRequirement}
-                        onChange={handleMarginRequirementChange}
-                        min="0"
-                        step="0.01"
-                        placeholder="0.00"
-                    />
-                </div>
-
-                <div className="position-toggle-container">
-                    <span className={!isLong ? 'active' : ''}>Short</span>
+            </div>
+            
+            <div className="calculator-main">
+                <header className="LeverageCalculator-header">
+                    <h1>Leverage Calculator</h1>
                     <button
-                        className={`position-toggle ${isLong ? 'long' : 'short'}`}
-                        onClick={togglePositionType}
+                        className="theme-toggle"
+                        onClick={toggleTheme}
                         aria-label={
-                            isLong
-                                ? 'Switch to short position'
-                                : 'Switch to long position'
+                            isDarkTheme
+                                ? 'Switch to light mode'
+                                : 'Switch to dark mode'
                         }
                     >
-                        <span className="position-toggle-slider"></span>
+                        {isDarkTheme ? '☀️' : '🌙'}
                     </button>
-                    <span className={isLong ? 'active' : ''}>Long</span>
-                </div>
-
-                <div className="results">
-                    <div className="result-item">
-                        <span>PNL:</span>
-                        {isWrongInput ? (
-                            <span className="result-value error">
-                                Invalid Input
-                            </span>
-                        ) : (
-                            <span
-                                className={`result-value ${parseFloat(pnlAbsolute) > 0 ? 'positive' : parseFloat(pnlAbsolute) < 0 ? 'negative' : ''}`}
-                            >
-                                {pnlAbsolute}$
-                            </span>
-                        )}
-                    </div>
-                    <div className="result-item">
-                        <span>PNL (%):</span>
-                        {isWrongInput ? (
-                            <span className="result-value error">
-                                Invalid Input
-                            </span>
-                        ) : (
-                            <span
-                                className={`result-value ${parseFloat(pnlPercent) > 0 ? 'positive' : parseFloat(pnlPercent) < 0 ? 'negative' : ''}`}
-                            >
-                                {pnlPercent}%
-                            </span>
-                        )}
-                    </div>
-                    <div className="result-item">
-                        <span>Liquidation Price:</span>
-                        {isWrongInput ? (
-                            <span className="result-value error">
-                                Invalid Input
-                            </span>
-                        ) : (
-                            <span className={`result-value liquidation`}>
-                                {liquidationPrice}$
-                            </span>
-                        )}
-                    </div>
-                </div>
-                <div className="result-container">
-                    <h3>Intermediate Results</h3>
+                </header>
+                <main className="calculator-container">
                     <div className="input-group">
-                        <label htmlFor="intermediate-price" data-unit="$">
-                            Intermediate Price
+                        <label htmlFor="leverage" data-unit="x">
+                            Leverage
                         </label>
                         <input
-                            id="intermediate-price"
+                            id="leverage"
                             type="number"
-                            value={intermediatePrice}
-                            onChange={handleIntermediatePriceChange}
+                            value={leverage}
+                            onChange={handleLeverageChange}
+                            min="0"
+                            step="0.1"
+                            placeholder="1.0"
+                        />
+                    </div>
+
+                    <div className="input-group">
+                        <label htmlFor="entry-price" data-unit="$">
+                            Entry Price
+                        </label>
+                        <input
+                            id="entry-price"
+                            type="number"
+                            value={entryPrice}
+                            onChange={handleEntryPriceChange}
                             min="0"
                             step="0.01"
                             placeholder="0.00"
                         />
                     </div>
-                    {intermediatePrice > 0 && (
-                        <>
+
+                    <div className="input-group">
+                        <label htmlFor="exit-price" data-unit="$">
+                            Exit Price
+                        </label>
+                        <input
+                            id="exit-price"
+                            type="number"
+                            value={exitPrice}
+                            onChange={handleExitPriceChange}
+                            min="0"
+                            step="0.01"
+                            placeholder="0.00"
+                        />
+                    </div>
+
+                    <div className="input-group">
+                        <label htmlFor="margin-requirement" data-unit="$">
+                            Margin Requirement
+                        </label>
+                        <input
+                            id="margin-requirement"
+                            type="number"
+                            value={marginRequirement}
+                            onChange={handleMarginRequirementChange}
+                            min="0"
+                            step="0.01"
+                            placeholder="0.00"
+                        />
+                    </div>
+
+                    <div className="position-toggle-container">
+                        <span className={!isLong ? 'active' : ''}>Short</span>
+                        <button
+                            className={`position-toggle ${isLong ? 'long' : 'short'}`}
+                            onClick={togglePositionType}
+                            aria-label={
+                                isLong
+                                    ? 'Switch to short position'
+                                    : 'Switch to long position'
+                            }
+                        >
+                            <span className="position-toggle-slider"></span>
+                        </button>
+                        <span className={isLong ? 'active' : ''}>Long</span>
+                    </div>
+
+                    <div className="results">
+                        <div className="result-item">
+                            <span>PNL:</span>
+                            {isWrongInput ? (
+                                <span className="result-value error">
+                                    Invalid Input
+                                </span>
+                            ) : (
+                                <span
+                                    className={`result-value ${parseFloat(pnlAbsolute) > 0 ? 'positive' : parseFloat(pnlAbsolute) < 0 ? 'negative' : ''}`}
+                                >
+                                    {pnlAbsolute}$
+                                </span>
+                            )}
+                        </div>
+                        <div className="result-item">
+                            <span>PNL (%):</span>
+                            {isWrongInput ? (
+                                <span className="result-value error">
+                                    Invalid Input
+                                </span>
+                            ) : (
+                                <span
+                                    className={`result-value ${parseFloat(pnlPercent) > 0 ? 'positive' : parseFloat(pnlPercent) < 0 ? 'negative' : ''}`}
+                                >
+                                    {pnlPercent}%
+                                </span>
+                            )}
+                        </div>
+                        {feesEnabled && (
                             <div className="result-item">
-                                <span>Intermediate PNL:</span>
+                                <span>Fees:</span>
+                                {isWrongInput ? (
+                                    <span className="result-value error">
+                                        Invalid Input
+                                    </span>
+                                ) : (
+                                    <span className="result-value">
+                                        {fees}$
+                                    </span>
+                                )}
+                            </div>
+                        )}
+                        {feesEnabled && (
+                            <div className="result-item">
+                                <span>PNL after fees:</span>
                                 {isWrongInput ? (
                                     <span className="result-value error">
                                         Invalid Input
                                     </span>
                                 ) : (
                                     <span
-                                        className={`result-value ${parseFloat(intermediatePnlAbsolute) > 0 ? 'positive' : parseFloat(intermediatePnlAbsolute) < 0 ? 'negative' : ''}`}
+                                        className={`result-value ${parseFloat(pnlAfterFees) > 0 ? 'positive' : parseFloat(pnlAfterFees) < 0 ? 'negative' : ''}`}
                                     >
-                                        {intermediatePnlAbsolute}$
+                                        {pnlAfterFees}$
                                     </span>
                                 )}
                             </div>
-                            <div className="result-item">
-                                <span>Intermediate PNL (%):</span>
-                                {isWrongInput ? (
-                                    <span className="result-value error">
-                                        Invalid Input
-                                    </span>
-                                ) : (
-                                    <span
-                                        className={`result-value ${parseFloat(intermediatePnlPercent) > 0 ? 'positive' : parseFloat(intermediatePnlPercent) < 0 ? 'negative' : ''}`}
-                                    >
-                                        {intermediatePnlPercent}%
-                                    </span>
-                                )}
-                            </div>
-                        </>
-                    )}
-                </div>
-            </main>
+                        )}
+                        <div className="result-item">
+                            <span>Liquidation Price:</span>
+                            {isWrongInput ? (
+                                <span className="result-value error">
+                                    Invalid Input
+                                </span>
+                            ) : (
+                                <span className={`result-value liquidation`}>
+                                    {liquidationPrice}$
+                                </span>
+                            )}
+                        </div>
+                    </div>
+                    <div className="result-container">
+                        <h3>Intermediate Results</h3>
+                        <div className="input-group">
+                            <label htmlFor="intermediate-price" data-unit="$">
+                                Intermediate Price
+                            </label>
+                            <input
+                                id="intermediate-price"
+                                type="number"
+                                value={intermediatePrice}
+                                onChange={handleIntermediatePriceChange}
+                                min="0"
+                                step="0.01"
+                                placeholder="0.00"
+                            />
+                        </div>
+                        {intermediatePrice > 0 && (
+                            <>
+                                <div className="result-item">
+                                    <span>Intermediate PNL:</span>
+                                    {isWrongInput ? (
+                                        <span className="result-value error">
+                                            Invalid Input
+                                        </span>
+                                    ) : (
+                                        <span
+                                            className={`result-value ${parseFloat(intermediatePnlAbsolute) > 0 ? 'positive' : parseFloat(intermediatePnlAbsolute) < 0 ? 'negative' : ''}`}
+                                        >
+                                            {intermediatePnlAbsolute}$
+                                        </span>
+                                    )}
+                                </div>
+                                <div className="result-item">
+                                    <span>Intermediate PNL (%):</span>
+                                    {isWrongInput ? (
+                                        <span className="result-value error">
+                                            Invalid Input
+                                        </span>
+                                    ) : (
+                                        <span
+                                            className={`result-value ${parseFloat(intermediatePnlPercent) > 0 ? 'positive' : parseFloat(intermediatePnlPercent) < 0 ? 'negative' : ''}`}
+                                        >
+                                            {intermediatePnlPercent}%
+                                        </span>
+                                    )}
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </main>
+            </div>
         </div>
     );
 }

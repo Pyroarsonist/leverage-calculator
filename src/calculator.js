@@ -5,6 +5,8 @@ export const calculate = ({
     entryPrice,
     isLong,
     intermediatePrice,
+    feePercentage = 0,
+    feesEnabled = false,
 }) => {
     const positionSize = leverage * marginRequirement;
     const units = positionSize / entryPrice;
@@ -44,12 +46,25 @@ export const calculate = ({
         liquidationPrice = entryPrice * (1 + 1 / leverage);
     }
 
+    // Calculate fees if enabled
+    let fees = 0;
+    let pnlAfterFees = pnlAbsolute;
+    
+    if (feesEnabled && feePercentage > 0) {
+        // Calculate fees based on position size
+        fees = (positionSize * feePercentage) / 100;
+        // Subtract fees from PNL
+        pnlAfterFees = pnlAbsolute - fees;
+    }
+
     return {
         pnlAbsolute: pnlAbsolute.toFixed(2),
         pnlPercent: pnlPercent.toFixed(2),
         liquidationPrice: liquidationPrice.toFixed(2),
         intermediatePnlAbsolute: intermediatePnlAbsolute.toFixed(2),
         intermediatePnlPercent: intermediatePnlPercent.toFixed(2),
+        fees: fees.toFixed(2),
+        pnlAfterFees: pnlAfterFees.toFixed(2),
         isWrongInput: isNaN(pnlPercent),
     };
 };
