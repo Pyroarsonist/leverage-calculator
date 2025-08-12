@@ -41,7 +41,7 @@ function LeverageCalculator() {
         getStoredValue('intermediatePrice', 0)
     );
     const [feePercentage, setFeePercentage] = useState(() =>
-        getStoredValue('feePercentage', 0.05)
+        getStoredValue('feePercentage', 0.1)
     );
     const [feesEnabled, setFeesEnabled] = useState(
         () => localStorage.getItem('feesEnabled') !== 'false'
@@ -71,11 +71,11 @@ function LeverageCalculator() {
     useEffect(() => {
         saveToLocalStorage('intermediatePrice', intermediatePrice);
     }, [intermediatePrice]);
-    
+
     useEffect(() => {
         saveToLocalStorage('feePercentage', feePercentage);
     }, [feePercentage]);
-    
+
     useEffect(() => {
         localStorage.setItem('feesEnabled', feesEnabled.toString());
     }, [feesEnabled]);
@@ -124,6 +124,7 @@ function LeverageCalculator() {
         liquidationPrice,
         intermediatePnlAbsolute,
         intermediatePnlPercent,
+        intermediatePnlAfterFees,
         fees,
         pnlAfterFees,
         isWrongInput,
@@ -167,7 +168,7 @@ function LeverageCalculator() {
                     />
                 </div>
             </div>
-            
+
             <div className="calculator-main">
                 <header className="LeverageCalculator-header">
                     <h1>Leverage Calculator</h1>
@@ -378,6 +379,24 @@ function LeverageCalculator() {
                                         </span>
                                     )}
                                 </div>
+                                {feesEnabled && (
+                                    <div className="result-item">
+                                        <span>
+                                            Intermediate PNL after fees:
+                                        </span>
+                                        {isWrongInput ? (
+                                            <span className="result-value error">
+                                                Invalid Input
+                                            </span>
+                                        ) : (
+                                            <span
+                                                className={`result-value ${parseFloat(intermediatePnlAfterFees) > 0 ? 'positive' : parseFloat(intermediatePnlAfterFees) < 0 ? 'negative' : ''}`}
+                                            >
+                                                {intermediatePnlAfterFees}$
+                                            </span>
+                                        )}
+                                    </div>
+                                )}
                             </>
                         )}
                     </div>
