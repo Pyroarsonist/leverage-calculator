@@ -3,7 +3,7 @@ export const calculate = ({
     marginRequirement,
     exitPrice,
     entryPrice,
-    isLong = true,
+    isLong,
 }) => {
     const positionSize = leverage * marginRequirement;
     const units = positionSize / entryPrice;
@@ -12,8 +12,8 @@ export const calculate = ({
     const priceDifference = isLong
         ? exitPrice - entryPrice
         : entryPrice - exitPrice;
-    const profitLoss = units * priceDifference;
-    const pnl = (profitLoss / positionSize) * 100;
+    const pnlAbsolute = units * priceDifference;
+    const pnlPercent = (pnlAbsolute / positionSize) * 100;
 
     // Calculate liquidation price
     // For long positions: liquidation occurs when price falls below a certain threshold
@@ -32,8 +32,9 @@ export const calculate = ({
     }
 
     return {
-        profitLoss: profitLoss.toFixed(2),
-        pnl: pnl.toFixed(2),
+        pnlAbsolute: pnlAbsolute.toFixed(2),
+        pnlPercent: pnlPercent.toFixed(2),
         liquidationPrice: liquidationPrice.toFixed(2),
+        isWrongInput: isNaN(pnlPercent),
     };
 };

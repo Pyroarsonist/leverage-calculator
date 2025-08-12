@@ -154,6 +154,14 @@
   color: #dc3545; /* Red color for negative values */
 }
 
+.result-value.error {
+    color: #dc7618;
+}
+
+.result-value.liquidation {
+    color: #8497fa;
+}
+
 .theme-toggle {
   background-color: var(--theme-toggle-bg);
   color: var(--theme-toggle-text);

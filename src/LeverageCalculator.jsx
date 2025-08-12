@@ -60,22 +60,22 @@ function LeverageCalculator() {
     }, [isLong]);
 
     const handleLeverageChange = (e) => {
-        const value = parseFloat(e.target.value) || 0;
+        const value = parseFloat(e.target.value);
         setLeverage(value);
     };
 
     const handleEntryPriceChange = (e) => {
-        const value = parseFloat(e.target.value) || 0;
+        const value = parseFloat(e.target.value);
         setEntryPrice(value);
     };
 
     const handleExitPriceChange = (e) => {
-        const value = parseFloat(e.target.value) || 0;
+        const value = parseFloat(e.target.value);
         setExitPrice(value);
     };
 
     const handleMarginRequirementChange = (e) => {
-        const value = parseFloat(e.target.value) || 0;
+        const value = parseFloat(e.target.value);
         setMarginRequirement(value);
     };
 
@@ -83,7 +83,12 @@ function LeverageCalculator() {
         setIsLong(!isLong);
     };
 
-    const { profitLoss, pnl, liquidationPrice } = calculate({
+    const {
+        pnlAbsolute,
+        pnlPercent: pnlPercent,
+        liquidationPrice,
+        isWrongInput,
+    } = calculate({
         leverage,
         entryPrice,
         exitPrice,
@@ -187,25 +192,43 @@ function LeverageCalculator() {
                 <div className="results">
                     <div className="result-item">
                         <span>PNL:</span>
-                        <span
-                            className={`result-value ${parseFloat(profitLoss) > 0 ? 'positive' : parseFloat(profitLoss) < 0 ? 'negative' : ''}`}
-                        >
-                            {profitLoss}$
-                        </span>
+                        {isWrongInput ? (
+                            <span className="result-value error">
+                                Invalid Input
+                            </span>
+                        ) : (
+                            <span
+                                className={`result-value ${parseFloat(pnlAbsolute) > 0 ? 'positive' : parseFloat(pnlAbsolute) < 0 ? 'negative' : ''}`}
+                            >
+                                {pnlAbsolute}$
+                            </span>
+                        )}
                     </div>
                     <div className="result-item">
                         <span>PNL (%):</span>
-                        <span
-                            className={`result-value ${parseFloat(pnl) > 0 ? 'positive' : parseFloat(pnl) < 0 ? 'negative' : ''}`}
-                        >
-                            {pnl}%
-                        </span>
+                        {isWrongInput ? (
+                            <span className="result-value error">
+                                Invalid Input
+                            </span>
+                        ) : (
+                            <span
+                                className={`result-value ${parseFloat(pnlPercent) > 0 ? 'positive' : parseFloat(pnlPercent) < 0 ? 'negative' : ''}`}
+                            >
+                                {pnlAbsolute}$
+                            </span>
+                        )}
                     </div>
                     <div className="result-item">
                         <span>Liquidation Price:</span>
-                        <span className="result-value">
-                            {liquidationPrice}$
-                        </span>
+                        {isWrongInput ? (
+                            <span className="result-value error">
+                                Invalid Input
+                            </span>
+                        ) : (
+                            <span className={`result-value liquidation`}>
+                                {liquidationPrice}$
+                            </span>
+                        )}
                     </div>
                 </div>
             </main>
