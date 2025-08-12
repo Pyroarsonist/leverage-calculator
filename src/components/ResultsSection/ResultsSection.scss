@@ -1,0 +1,46 @@
+@use '../../variables' as *;
+
+.results {
+  margin-top: 30px;
+  background-color: var(--results-bg);
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid var(--results-border);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.result-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--result-item-border);
+  transition: border-color 0.3s ease;
+
+  &:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+}
+
+.result-value {
+  font-weight: bold;
+  color: var(--result-value-color);
+  transition: color $transition-speed ease;
+
+  &.positive {
+    color: $positive-color;
+  }
+
+  &.negative {
+    color: $negative-color;
+  }
+
+  &.error {
+    color: $error-color;
+  }
+
+  &.liquidation {
+    color: $liquidation-color;
+  }
+}

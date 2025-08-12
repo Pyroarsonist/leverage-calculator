@@ -1,0 +1,48 @@
+@use '../../variables' as *;
+
+.fees-container {
+  background-color: var(--container-bg);
+  padding: 20px;
+  border-radius: $border-radius;
+  box-shadow: $box-shadow;
+  transition: background-color $transition-speed ease, box-shadow $transition-speed ease;
+  width: 200px;
+  align-self: flex-start;
+  position: sticky;
+  top: 20px;
+  transform: rotate(-2deg);
+  
+  h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: var(--text-color);
+    font-size: 1.1em;
+    text-align: center;
+    border-bottom: 1px solid var(--result-item-border);
+    padding-bottom: 8px;
+  }
+  
+  .fees-checkbox {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    
+    input[type="checkbox"] {
+      margin-right: 10px;
+      cursor: pointer;
+    }
+    
+    label {
+      cursor: pointer;
+      font-weight: bold;
+    }
+  }
+}
+
+@media (max-width: $mobile-breakpoint) {
+  .fees-container {
+    width: 100%;
+    transform: none;
+    margin-bottom: 15px;
+  }
+}

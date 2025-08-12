@@ -1,0 +1,13 @@
+//@use 'variables' as *;
+
+
+// Variables
+$positive-color: #28a745; // Green color for positive values
+$negative-color: #dc3545; // Red color for negative values
+$error-color: #dc7618;    // Orange color for errors
+$liquidation-color: #8497fa; // Blue color for liquidation
+$border-radius: 8px;
+$transition-speed: 0.3s;
+$box-shadow: 0 4px 8px var(--shadow-color);
+$input-height: 40px;
+$mobile-breakpoint: 600px;

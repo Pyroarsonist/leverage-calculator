@@ -1,0 +1,154 @@
+@use '../../variables' as *;
+
+.input-group {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  position: relative;
+  padding-bottom: 2px; /* Space for the focus indicator */
+  transition: transform calc($transition-speed / 1.5) ease;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  label {
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: var(--text-color);
+    transition: color $transition-speed ease;
+    display: flex;
+    width: 100%;
+
+    &::after {
+      content: "(" attr(data-unit) ")";
+      opacity: 0.7;
+      font-weight: normal;
+      margin-left: 8px;
+    }
+  }
+
+  input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--input-border);
+    border-radius: calc($border-radius / 2);
+    font-size: 16px;
+    background-color: var(--input-bg, var(--container-bg));
+    color: var(--text-color);
+    transition: all $transition-speed ease;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+    outline: none;
+    position: relative;
+    font-family: 'Roboto Mono', monospace, sans-serif;
+    text-align: left;
+    height: $input-height; /* Fixed height for consistency */
+
+    /* Hide number input spinners */
+    &[type="number"]::-webkit-inner-spin-button,
+    &[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    &[type="number"] {
+      -moz-appearance: textfield; /* Firefox */
+    }
+
+    &:hover {
+      border-color: var(--input-hover-border, var(--input-border));
+    }
+
+    &:focus {
+      border-color: var(--input-focus-border, var(--theme-toggle-bg));
+      box-shadow: none;
+      outline: none;
+    }
+
+    &::placeholder {
+      color: var(--input-placeholder-color, rgba(var(--text-color-rgb, 51, 51, 51), 0.5));
+      opacity: 0.7;
+    }
+  }
+
+  /* Trading View style input container */
+  &::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background-color: var(--input-focus-border, var(--theme-toggle-bg));
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+    z-index: 1;
+  }
+
+  &:focus-within::before {
+    transform: scaleX(1);
+  }
+}
+
+/* Position toggle styles */
+.position-toggle-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px 0;
+  gap: 10px;
+
+  span {
+    font-weight: 500;
+    color: var(--text-color);
+    opacity: 0.6;
+    transition: opacity 0.3s ease, color 0.3s ease;
+
+    &.active {
+      opacity: 1;
+      font-weight: bold;
+    }
+  }
+}
+
+.position-toggle {
+  position: relative;
+  width: 60px;
+  height: 30px;
+  border-radius: 15px;
+  background-color: var(--input-border);
+  border: none;
+  cursor: pointer;
+  transition: background-color $transition-speed ease;
+  padding: 0;
+
+  &-slider {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: white;
+    transition: transform $transition-speed ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  }
+
+  &.long {
+    background-color: $positive-color;
+
+    .position-toggle-slider {
+      transform: translateX(30px);
+    }
+  }
+
+  &.short {
+    background-color: $negative-color;
+  }
+
+  &:hover {
+    opacity: 0.9;
+  }
+}

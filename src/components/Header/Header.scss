@@ -1,0 +1,40 @@
+@use '../../variables' as *;
+
+.LeverageCalculator-header {
+  background-color: var(--header-bg);
+  padding: 20px;
+  color: var(--header-text);
+  border-radius: $border-radius $border-radius 0 0;
+  margin-bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.theme-toggle {
+  background-color: var(--theme-toggle-bg);
+  color: var(--theme-toggle-text);
+  border: 2px solid transparent;
+  border-radius: 50%;
+  width: $input-height;
+  height: $input-height;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 
+    background-color $transition-speed ease, 
+    color $transition-speed ease, 
+    border-color $transition-speed ease, 
+    transform calc($transition-speed / 1.5) ease, 
+    box-shadow $transition-speed ease;
+  box-shadow: 0 2px 5px var(--shadow-color);
+  font-size: 1.2em;
+
+  &:hover {
+    background-color: var(--theme-toggle-hover-bg);
+    transform: scale(1.05);
+    border-color: var(--theme-toggle-text);
+    box-shadow: 0 3px 8px var(--shadow-color);
+  }
+}
