@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import './LeverageCalculator.css';
+import './LeverageCalculator.scss';
 import { useTheme } from './ThemeContext';
 import { calculate } from './calculator.js';
 
@@ -37,6 +37,9 @@ function LeverageCalculator() {
     const [isLong, setIsLong] = useState(
         () => localStorage.getItem('isLong') !== 'false'
     );
+    const [intermediatePrice, setIntermediatePrice] = useState(() =>
+        getStoredValue('intermediatePrice', 0)
+    );
     const { isDarkTheme, toggleTheme } = useTheme();
 
     useEffect(() => {
@@ -59,6 +62,10 @@ function LeverageCalculator() {
         localStorage.setItem('isLong', isLong.toString());
     }, [isLong]);
 
+    useEffect(() => {
+        saveToLocalStorage('intermediatePrice', intermediatePrice);
+    }, [intermediatePrice]);
+
     const handleLeverageChange = (e) => {
         const value = parseFloat(e.target.value);
         setLeverage(value);
@@ -79,6 +86,11 @@ function LeverageCalculator() {
         setMarginRequirement(value);
     };
 
+    const handleIntermediatePriceChange = (e) => {
+        const value = parseFloat(e.target.value);
+        setIntermediatePrice(value);
+    };
+
     const togglePositionType = () => {
         setIsLong(!isLong);
     };
@@ -87,6 +99,8 @@ function LeverageCalculator() {
         pnlAbsolute,
         pnlPercent: pnlPercent,
         liquidationPrice,
+        intermediatePnlAbsolute,
+        intermediatePnlPercent,
         isWrongInput,
     } = calculate({
         leverage,
@@ -94,6 +108,7 @@ function LeverageCalculator() {
         exitPrice,
         marginRequirement,
         isLong,
+        intermediatePrice,
     });
 
     return (
@@ -214,7 +229,7 @@ function LeverageCalculator() {
                             <span
                                 className={`result-value ${parseFloat(pnlPercent) > 0 ? 'positive' : parseFloat(pnlPercent) < 0 ? 'negative' : ''}`}
                             >
-                                {pnlAbsolute}$
+                                {pnlPercent}%
                             </span>
                         )}
                     </div>
@@ -230,6 +245,55 @@ function LeverageCalculator() {
                             </span>
                         )}
                     </div>
+                </div>
+                <div className="result-container">
+                    <h3>Intermediate Results</h3>
+                    <div className="input-group">
+                        <label htmlFor="intermediate-price" data-unit="$">
+                            Intermediate Price
+                        </label>
+                        <input
+                            id="intermediate-price"
+                            type="number"
+                            value={intermediatePrice}
+                            onChange={handleIntermediatePriceChange}
+                            min="0"
+                            step="0.01"
+                            placeholder="0.00"
+                        />
+                    </div>
+                    {intermediatePrice > 0 && (
+                        <>
+                            <div className="result-item">
+                                <span>Intermediate PNL:</span>
+                                {isWrongInput ? (
+                                    <span className="result-value error">
+                                        Invalid Input
+                                    </span>
+                                ) : (
+                                    <span
+                                        className={`result-value ${parseFloat(intermediatePnlAbsolute) > 0 ? 'positive' : parseFloat(intermediatePnlAbsolute) < 0 ? 'negative' : ''}`}
+                                    >
+                                        {intermediatePnlAbsolute}$
+                                    </span>
+                                )}
+                            </div>
+                            <div className="result-item">
+                                <span>Intermediate PNL (%):</span>
+                                {isWrongInput ? (
+                                    <span className="result-value error">
+                                        Invalid Input
+                                    </span>
+                                ) : (
+                                    <span
+                                        className={`result-value ${parseFloat(intermediatePnlPercent) > 0 ? 'positive' : parseFloat(intermediatePnlPercent) < 0 ? 'negative' : ''}`}
+                                    >
+                                        {intermediatePnlPercent}%
+                                    </span>
+                                )}
+                            </div>
+                        </>
+                    )}
                 </div>
             </main>
         </div>

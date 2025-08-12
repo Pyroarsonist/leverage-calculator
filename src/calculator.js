@@ -4,6 +4,7 @@ export const calculate = ({
     exitPrice,
     entryPrice,
     isLong,
+    intermediatePrice,
 }) => {
     const positionSize = leverage * marginRequirement;
     const units = positionSize / entryPrice;
@@ -14,6 +15,18 @@ export const calculate = ({
         : entryPrice - exitPrice;
     const pnlAbsolute = units * priceDifference;
     const pnlPercent = (pnlAbsolute / positionSize) * 100;
+
+    // Calculate intermediate PNL if intermediatePrice is provided
+    let intermediatePnlAbsolute = 0;
+    let intermediatePnlPercent = 0;
+
+    if (intermediatePrice) {
+        const intermediatePriceDifference = isLong
+            ? intermediatePrice - entryPrice
+            : entryPrice - intermediatePrice;
+        intermediatePnlAbsolute = units * intermediatePriceDifference;
+        intermediatePnlPercent = (intermediatePnlAbsolute / positionSize) * 100;
+    }
 
     // Calculate liquidation price
     // For long positions: liquidation occurs when price falls below a certain threshold
@@ -35,6 +48,8 @@ export const calculate = ({
         pnlAbsolute: pnlAbsolute.toFixed(2),
         pnlPercent: pnlPercent.toFixed(2),
         liquidationPrice: liquidationPrice.toFixed(2),
+        intermediatePnlAbsolute: intermediatePnlAbsolute.toFixed(2),
+        intermediatePnlPercent: intermediatePnlPercent.toFixed(2),
         isWrongInput: isNaN(pnlPercent),
     };
 };
