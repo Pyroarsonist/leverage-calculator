@@ -2,19 +2,24 @@
 
 .LeverageCalculator {
   text-align: center;
-  max-width: 800px;
-  margin: 0 auto;
   padding: 20px;
+  position: relative;
+}
+
+.calculator-wrapper {
+  max-width: 1020px;
+  margin: 0 auto;
   display: flex;
   flex-direction: row;
   gap: 20px;
-  position: relative;
 }
 
 .calculator-main {
   flex: 1;
   display: flex;
   flex-direction: column;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .calculator-container {
@@ -28,7 +33,14 @@
 @media (max-width: $mobile-breakpoint) {
   .LeverageCalculator {
     padding: 10px;
+  }
+  
+  .calculator-wrapper {
     flex-direction: column;
+  }
+  
+  .calculator-main {
+    width: 100%;
   }
 
   .calculator-container {

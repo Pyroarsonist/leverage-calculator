@@ -9,14 +9,16 @@ import IntermediateResultsSection from '../IntermediateResultsSection/Intermedia
 function LeverageCalculator() {
     return (
         <div className="LeverageCalculator">
-            <FeesSection />
-            <div className="calculator-main">
-                <Header />
-                <main className="calculator-container">
-                    <InputsSection />
-                    <ResultsSection />
-                    <IntermediateResultsSection />
-                </main>
+            <div className="calculator-wrapper">
+                <div className="calculator-main">
+                    <Header />
+                    <main className="calculator-container">
+                        <InputsSection />
+                        <ResultsSection />
+                        <IntermediateResultsSection />
+                    </main>
+                </div>
+                <FeesSection />
             </div>
         </div>
     );
